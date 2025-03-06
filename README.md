@@ -39,6 +39,7 @@ OWNER_ID=your_telegram_id
 COINMARKETCAP_API_KEY=your_coinmarketcap_api_key
 USER_LIST=user_ids_separated_by_commas
 FOOD_RESERVATION_LIST=user_ids_separated_by_commas
+TIMEZONE=your_timezone
 ```
 
 #### 2.3. Run the Bot
@@ -56,16 +57,16 @@ python bot.py
 - `/start`: Start the bot and get basic information.
 - `/help`: Show the list of available commands.
 - `/feedback`: Send anonymous feedback to the admin.
+- `/requestforreservation`: Request to be added to the food reservation list.
+- `/coin`: Get cryptocurrency prices.
 
-### Admin Commands
+### Admin Panel
 - `/myadmins`: View the list of admins.
 - `/adminmanager`: Manage admins (add, remove, or clear the admin list).
 - `/forcemessage`: Send a message to all users or specific users.
 - `/printusers`: View the list of users.
 - `/adduser`: Add a user to the user list.
-- `/coin`: Get cryptocurrency prices.
 - `/printreservation`: View the list of users on the food reservation list.
-- `/requestforreservation`: Request to be added to the food reservation list.
 
 ---
 

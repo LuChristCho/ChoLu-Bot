@@ -3,3 +3,4 @@ telebot
 requests
 apscheduler
 python-dotenv
+pytz

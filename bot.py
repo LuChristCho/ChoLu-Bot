@@ -1,18 +1,21 @@
+import os
+import pytz
+import time
 import telebot
-from telebot.types import ChatMemberUpdated
-from datetime import datetime, timedelta
-from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 import threading
-import time
-import os
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
+from telebot.types import ChatMemberUpdated
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.schedulers.background import BackgroundScheduler
 
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OWNER_ID = int(os.getenv("OWNER_ID"))
 COINMARKETCAP_API_KEY = os.getenv("COINMARKETCAP_API_KEY")
+TIMEZONE = os.getenv("TIMEZONE", "UTC")
 USER_LIST = list(map(int, os.getenv("USER_LIST").split(',')))
 FOOD_RESERVATION_LIST = list(map(int, os.getenv("FOOD_RESERVATION_LIST").split(',')))
 
@@ -21,7 +24,8 @@ bot_admins = [OWNER_ID]
 user_list = USER_LIST
 food_reservation_list = FOOD_RESERVATION_LIST
 user_feedback_count = {}
-scheduler = BackgroundScheduler()
+time_zone = pytz.timezone(TIMEZONE)
+scheduler = BackgroundScheduler(timezone=time_zone)
 
 
 @bot.message_handler(commands=['start'])
@@ -366,8 +370,8 @@ def handle_no(message):
         bot.reply_to(message, "You are not authorized to use this command.")
         
 def send_reminders():
-    now = datetime.now()
-    if now.weekday() == 2 and (22 <= now.hour < 24):
+    now = datetime.now(time_zone)
+    if now.weekday() == 2 and (22 <= now.hour <= 23):
         for user_id in food_reservation_list:
             try:
                 bot.send_message(user_id, "رزرو غذا فراموش نشه!")
