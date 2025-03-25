@@ -1,9 +1,5 @@
 # ChoLu Telegram Bot - Comprehensive Documentation
 
-![ChoLu Bot Logo](logo.png)  
-*Main User Interface*  
-![User Interface Screenshot](screenshot.png)
-
 ## Table of Contents
 - [Overview](#overview)
 - [Key Improvements](#key-improvements)
@@ -25,6 +21,8 @@
 ## Overview
 
 ChoLu is a versatile Telegram bot (version 3.1) designed with user experience in mind, featuring an intuitive interface built with aiogram for better inline keyboard support. The bot offers multiple functionalities including cryptocurrency price tracking, message forwarding, user management, and food reservation reminders. The bot now uses aiogram framework which provides better inline keyboard support and more responsive UI compared to the previous implementation.
+
+![ChoLu Bot Logo](logo.png)  
 
 ## Key Improvements
 
@@ -137,6 +135,9 @@ The bot uses a CSV-based database (`db.csv`) with the following columns:
 - `/database` - Export database as CSV
 
 ## User Commands
+
+*Main User Interface*  
+![User Interface Screenshot](screenshot.png)
 
 ### General
 - `🆘 Help` - Show help information
