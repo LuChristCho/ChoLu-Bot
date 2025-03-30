@@ -36,21 +36,6 @@ admin_list = ADMIN_LIST
 banned_users = BANNED_USERS
 reminder_list = FOOD_RESERVATION_LIST
 
-CRYPTOS = {
-    "BTC": "₿",
-    "ETH": "Ξ",
-    "USDT": "💵",
-    "XRP": "✕",
-    "BNB": "ⓑ",
-    "SOL": "◎",
-    "USDC": "💲",
-    "DOGE": "🐶",
-    "ADA": "🅰",
-    "TRX": "🅿",
-    "LINK": "🔗",
-    "TON": "⚡"
-}
-
 class UserStates(StatesGroup):
     waiting_for_message = State()
     admin_waiting_for_message = State()
@@ -103,13 +88,14 @@ async def log_message(message: types.Message):
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
     user_id = message.from_user.id
+    user_name = message.from_user.first_name
     if user_id in banned_users:
         await message.answer("You have been banned from the bot. Message the developer to unban.")
         return
     if user_id in admin_list:
-        await message.answer("Welcome to ChoLu 3.1! You are an admin. Press the Help button below for more information.", reply_markup=create_admin_keyboard())
+        await message.answer(f"Hello {user_name}:)\nWelcome to ChoLu 3.2! You are an admin. Press the Help button below for more information.", reply_markup=create_admin_keyboard())
     else:
-        await message.answer("Welcome to ChoLu 3.1! Press the Help button below for more information.", reply_markup=create_user_keyboard())
+        await message.answer(f"Hello {user_name}:)\nWelcome to ChoLu 3.2! Press the Help button below for more information.", reply_markup=create_user_keyboard())
     await log_message(message)
 
 ############################################################################################################################################################
@@ -127,31 +113,31 @@ async def help_command(message: types.Message):
     
     if user_id in admin_list:
         help_message = (
-            "Welcome to ChoLu 3.1! Here's what you can do as an admin:\n\n"
+            "Here's what you can do as an admin:\n\n"
             "👑 Admins:\n"
             "- View the list of admins.\n"
-            "- Add or remove admins using /admin_add and /admin_remove.\n\n"
+            "- Add or remove admins.\n\n"
             "👥 Users:\n"
             "- View the list of users.\n"
-            "- Ban or unban users using /user_ban and /user_unban.\n\n"
+            "- Ban or unban users.\n\n"
             "💰 Coin:\n"
-            "- Set your CoinMarketCap API Key using /set_api_key.\n"
+            "- Set your CoinMarketCap API Key.\n"
             "- View the latest prices of top cryptocurrencies.\n"
             "- View the list of registered APIs.\n\n"
             "⏰ Reminder:\n"
             "- Add yourself to the food reminder list.\n"
             "- Stop receiving food reminders.\n"
             "- View the list of users in the reminder list.\n"
-            "- Add or remove users from the reminder list using /add_to_reminder and /remove_from_reminder.\n\n"
+            "- Add or remove users from the reminder list.\n\n"
             "📩 Message:\n"
-            "- Send messages to users using /send_message.\n\n"
+            "- Send messages to users.\n\n"
             "If you need further assistance, contact the developer."
         )
     else:
         help_message = (
-            "Welcome to ChoLu 3.1! Here's what you can do:\n\n"
+            "Here's what you can do:\n\n"
             "💰 Coin:\n"
-            "- Set your CoinMarketCap API Key using /set_api_key.\n"
+            "- Set your CoinMarketCap API Key.\n"
             "- View the latest prices of top cryptocurrencies.\n\n"
             "⏰ Reminder:\n"
             "- Add yourself to the food reminder list.\n"
@@ -172,6 +158,10 @@ async def help_command(message: types.Message):
 @dp.message(F.text == "👑 Admins")
 async def admins_command(message: types.Message):
     user_id = message.from_user.id
+    if user_id in banned_users:
+        await message.answer("You have been banned from the bot. Message the developer to unban.")
+        return
+    
     if user_id not in admin_list:
         await message.answer("You do not have permission to access this command.")
         await log_message(message)
@@ -261,6 +251,9 @@ async def remove_admin_command(message: types.Message):
 @dp.message(F.text == "👥 Users")
 async def users_command(message: types.Message):
     user_id = message.from_user.id
+    if user_id in banned_users:
+        await message.answer("You have been banned from the bot. Message the developer to unban.")
+        return
     
     if user_id not in admin_list:
         await message.answer("You do not have permission to access this command.")
@@ -300,7 +293,7 @@ async def user_manual_add_command(message: types.Message):
         await message.answer("You have been banned from the bot. Message the developer to unban.")
         return
     
-    if user_id not in admin_list:
+    if user_id != OWNER_ID:
         await message.answer("You do not have permission to use this command.")
         await log_message(message)
         return
@@ -340,8 +333,15 @@ async def user_ban_command(message: types.Message):
         return
     
     if target_id not in banned_users:
-        banned_users.append(target_id)
-        await message.answer(f"User {target_id} has been banned.")
+        if target_id not in admin_list:
+            banned_users.append(target_id)
+            await message.answer(f"User {target_id} has been banned.")
+        else:
+            if user_id == OWNER_ID:
+                banned_users.append(target_id)
+                await message.answer(f"User {target_id} has been banned.")
+            else:
+                await message.answer("You cannot ban an admin.")
     else:
         await message.answer(f"User {target_id} is already banned.")
     
@@ -367,8 +367,15 @@ async def user_unban_command(message: types.Message):
         return
     
     if target_id in banned_users:
-        banned_users.remove(target_id)
-        await message.answer(f"User {target_id} has been unbanned.")
+        if target_id not in admin_list:
+            banned_users.remove(target_id)
+            await message.answer(f"User {target_id} has been unbanned.")
+        else:
+            if user_id == OWNER_ID:
+                banned_users.append(target_id)
+                await message.answer(f"User {target_id} has been unbanned.")
+            else:
+                await message.answer("You cannot unban an admin.")
     else:
         await message.answer(f"User {target_id} is not banned.")
     
@@ -463,7 +470,7 @@ async def handle_admin_message(message: types.Message, state: FSMContext):
     Errormsg = 0
     if target_users == "all":
         for target_id in user_list:
-            if target_id not in banned_users and target_id != OWNER_ID:
+            if target_id not in banned_users and target_id != user_id:
                 try:
                     await bot.copy_message(
                         chat_id=target_id,
@@ -673,7 +680,7 @@ async def remove_from_reminder_admin_command(message: types.Message):
 
 async def send_reminders():
     while True:
-        now = datetime.now()
+        now = datetime.now(time_zone)
         if now.weekday() == 2 and 22 <= now.hour < 23:  
             for user_id in reminder_list:
                 try:
@@ -689,6 +696,8 @@ async def send_reminders():
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
+
+CRYPTOS = {"BTC": "₿", "ETH": "Ξ", "USDT": "💵", "XRP": "✕", "BNB": "ⓑ", "SOL": "◎", "USDC": "💲", "DOGE": "🐶", "ADA": "🅰", "TRX": "🅿", "LINK": "🔗", "TON": "⚡"}
 
 @dp.message(F.text == "💰 Coin")
 async def coin_command(message: types.Message):
@@ -839,7 +848,7 @@ async def handle_database_command(message: types.Message):
         await message.answer("You have been banned from the bot. Message the developer to unban.")
         return
     
-    if user_id not in ADMIN_LIST:
+    if user_id not in admin_list:
         await message.answer("❌ Only admins can access this command")
         await log_message(message)
         return
@@ -855,7 +864,8 @@ async def handle_database_command(message: types.Message):
     )
     if not success:
         await message.answer("❌ Failed to export database")
-        await log_message(message)
+    
+    await log_message(message)
 
 @dp.message()
 async def forward_all_messages(message: types.Message):

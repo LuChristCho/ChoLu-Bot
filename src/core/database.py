@@ -2,11 +2,12 @@ import pandas as pd
 from pathlib import Path
 import json
 from typing import Dict, List, Any
+from aiogram.types import FSInputFile
 
 class Database:
     def __init__(self):
-        self.db_path = Path(__file__).parent / "db.csv"
-        self.config_path = Path(__file__).parent / "config.json"
+        self.db_path = Path(__file__).parent / "data/db.csv"
+        self.config_path = Path(__file__).parent / "src/config.json"
         self.df = self._load_database()
         self.config = self._load_config()
 
@@ -17,13 +18,13 @@ class Database:
     def _load_database(self) -> pd.DataFrame:
         if self.db_path.exists():
             df = pd.read_csv(self.db_path)
-            int_columns = ['UserID', 'Ban', 'Adminstration', 'CMC_Access', 'Reminder']
+            int_columns = ['UserID', 'Ban', 'Adminstration', 'Reminder']
             df[int_columns] = df[int_columns].astype(int)
             return df
         else:
             return pd.DataFrame(columns=[
                 'UserID', 'Ban', 'Adminstration', 
-                'CMC_Access', 'API', 'Reminder', 'Name'
+                'API', 'Reminder', 'Name'
             ])
 
     def save_database(self):
@@ -65,7 +66,6 @@ class Database:
                     'UserID': user_id,
                     'Ban': 0,
                     'Adminstration': 0,
-                    'CMC_Access': 0,
                     'API': "",
                     'Reminder': 0,
                     'Name': f"User_{user_id}" 
@@ -79,13 +79,11 @@ class Database:
         
         self.df['Reminder'] = self.df['UserID'].isin(reminder_list).astype(int)
         
-        self.df['CMC_Access'] = 0
         self.df['API'] = ""
         
         for user_id_str, api_key in cmc_api_keys.items():
             user_id = int(user_id_str)
             if user_id in self.df['UserID'].values:
-                self.df.loc[self.df['UserID'] == user_id, 'CMC_Access'] = 1
                 self.df.loc[self.df['UserID'] == user_id, 'API'] = api_key
         
         self.save_database()
@@ -108,7 +106,6 @@ class Database:
             temp_path = Path(__file__).parent / "temp_db.csv"
             self.df.to_csv(temp_path, index=False, encoding='utf-8-sig')
             
-            from aiogram.types import FSInputFile
             await bot.send_document(
                 chat_id=chat_id,
                 document=FSInputFile(temp_path),

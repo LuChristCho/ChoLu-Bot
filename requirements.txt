@@ -1,4 +1,5 @@
 aiogram
+telebot
 pytz
 requests
 python-dotenv

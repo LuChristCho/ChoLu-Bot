@@ -20,16 +20,17 @@
 
 ## Overview
 
-ChoLu is a versatile Telegram bot (version 3.1) designed with user experience in mind, featuring an intuitive interface built with aiogram for better inline keyboard support. The bot offers multiple functionalities including cryptocurrency price tracking, message forwarding, user management, and food reservation reminders. The bot now uses aiogram framework which provides better inline keyboard support and more responsive UI compared to the previous implementation.
+ChoLu is a versatile Telegram bot (version 3.2) designed with user experience in mind, featuring an intuitive interface built with aiogram for better inline keyboard support. The bot offers multiple functionalities including cryptocurrency price tracking, message forwarding, user management, and food reservation reminders. The bot now uses aiogram framework which provides better inline keyboard support and more responsive UI compared to the previous implementation.
 
 ![ChoLu Bot Logo](logo.png)  
 
 ## Key Improvements
 
-- **Modern UI**: Migrated from legacy library to aiogram framework for better inline keyboard support and user-friendly interface
+- **User-Friendly Interface**: Migrated from legacy library to aiogram framework for better inline keyboard support and user-friendly interface
 - **Enhanced Performance**: Multi-stage Docker build for optimized container size
 - **Improved Reliability**: Better error handling and logging mechanisms
 - **User Experience**: Redesigned menu system with intuitive navigation
+- **Multifunctional**: Has two versions: button and command only
 
 ## Features
 
@@ -51,19 +52,22 @@ ChoLu is a versatile Telegram bot (version 3.1) designed with user experience in
 ### Docker Setup (Recommended)
 
 ```bash
+# Build and run standard version
 docker build -t cholu-bot .
 docker run -d --name cholu-bot --restart unless-stopped \
   -v ./data:/app/data \
   cholu-bot
+
+# For CM version (using same image)
+docker run -d --name cholu-bot-cm --restart unless-stopped \
+  -v ./data:/app/data \
+  -e BOT_MODE=CM \
+  cholu-bot
 ```
 
-The Docker image uses a multi-stage build:
-1. Builder stage with compiler tools
-2. Final lightweight image with only necessary dependencies
+## Manual Installation
 
-### Manual Installation
-
-1. Create and activate a virtual environment:
+1. Create and activate virtual environment:
    ```bash
    python -m venv venv
    source venv/bin/activate  # Linux/Mac
@@ -75,11 +79,12 @@ The Docker image uses a multi-stage build:
    pip install -r requirements.txt
    ```
 
-3. Configure the bot (see [Configuration](#configuration) section)
+3. Configure the bot by creating `config.json` in root directory
 
 4. Run the bot:
    ```bash
-   python main.py
+   python src/core/main.py        # Standard version
+   python src/core/main-cmversion.py  # CM version
    ```
 
 ## Configuration
@@ -109,7 +114,6 @@ The bot uses a CSV-based database (`db.csv`) with the following columns:
 | UserID | int | Telegram user ID |
 | Ban | int (0/1) | Whether user is banned |
 | Adminstration | int (0/1) | Admin status |
-| CMC_Access | int (0/1) | CoinMarketCap API access |
 | API | str | CoinMarketCap API key |
 | Reminder | int (0/1) | Food reminder subscription |
 | Name | str | User display name |
