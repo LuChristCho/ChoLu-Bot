@@ -15,7 +15,6 @@
 - [Reminder System](#reminder-system)
 - [Technical Details](#technical-details)
 - [License](#license)
-- [Support](#support)
 - [Contributing](#contributing)
 
 ## Overview
@@ -190,10 +189,6 @@ The bot automatically sends food reservation reminders:
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Support
-
-If you have any questions or need assistance, feel free to reach out on [Telegram](https://t.me/masihssj).
 
 ## Contributing
 
